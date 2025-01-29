@@ -1,7 +1,7 @@
 // Pacman Game in C language 
 #include <conio.h> 
 #include <stdio.h> 
-#include <stdlib.h> 
+#include <stdlib.h>
 
 // All the elements to be used 
 // Declared here 
@@ -12,6 +12,7 @@
 #define FOOD '.' 
 #define EMPTY ' ' 
 #define DEMON 'X' 
+#define BONUS '$'
 
 // Global Variables are 
 // Declared here 
@@ -19,8 +20,10 @@ int res = 0;
 int score = 0; 
 int pacman_x, pacman_y; 
 char board[HEIGHT][WIDTH]; 
-int food = 0; 
+int food = 0;
+int bonus = 0; 
 int curr = 0; 
+int powermove = 0;
 void initialize() 
 { 
 	// Putting Walls as boundary in the Game 
@@ -75,6 +78,19 @@ void initialize()
 	pacman_y = HEIGHT / 2; 
 	board[pacman_y][pacman_x] = PACMAN; 
 
+	// Putting Demons in the Game 
+	count = 10; 
+	while (count != 0) { 
+		int i = (rand() % (HEIGHT + 1)); 
+		int j = (rand() % (WIDTH + 1)); 
+
+		if (board[i][j] != WALL && board[i][j] != PACMAN && board[i][j] != DEMON) { 
+			board[i][j] = BONUS; 
+			count--; 
+            bonus++;
+		} 
+	} 
+
 	// Points Placed 
 	for (int i = 0; i < HEIGHT; i++) { 
 		for (int j = 0; j < WIDTH; j++) { 
@@ -123,7 +139,10 @@ void move(int move_x, int move_y)
 		} 
 		else if (board[y][x] == DEMON) { 
 			res = 1; 
-		} 
+		}
+        else if(board[y][x] == BONUS){
+            powermove += 10;
+        } 
 
 		board[pacman_y][pacman_x] = EMPTY; 
 		pacman_x = x; 
@@ -139,6 +158,8 @@ int main()
 	char ch; 
 	food -= 35; 
 	int totalFood = food; 
+    int totalbonus = bonus;
+    curr = 0 ;
 	// Instructions to Play 
 	printf(" Use buttons for w(up), a(left) , d(right) and "
 		"s(down)\nAlso, Press q for quit\n"); 
@@ -155,6 +176,8 @@ int main()
 		draw(); 
 		printf("Total Food count: %d\n", totalFood); 
 		printf("Total Food eaten: %d\n", curr); 
+        printf("Total Bonus count: %d\n" , totalbonus);
+        printf("Power moves: %d\n" , powermove);
 		if (res == 1) { 
 			// Clear screen 
 			system("cls"); 
@@ -175,7 +198,32 @@ int main()
 		ch = getch(); 
 
 		// Moving According to the 
-		// input character 
+		// input character
+        if(powermove > 0){ 
+		switch (ch) { 
+		case 'w': 
+			move(0, -2);
+            powermove--; 
+			break; 
+		case 's': 
+			move(0, 2);
+            powermove--;  
+			break; 
+		case 'a': 
+			move(-2, 0); 
+            powermove--; 
+			break; 
+		case 'd': 
+			move(2, 0); 
+            powermove--; 
+			break; 
+		case 'q': 
+			printf("Game Over! Your Score: %d\n", score); 
+			return 0; 
+		} 
+	    } 
+
+        else if(powermove <= 0){ 
 		switch (ch) { 
 		case 'w': 
 			move(0, -1); 
@@ -193,7 +241,10 @@ int main()
 			printf("Game Over! Your Score: %d\n", score); 
 			return 0; 
 		} 
-	} 
+	    } 
+        
+	    
+    }
 
 	return 0; 
 }
