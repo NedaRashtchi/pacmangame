@@ -32,7 +32,7 @@ int powermove = 0;
 void savegame(const char *filename) {
     FILE *file = fopen(filename, "wb");
     if (file == NULL){
-        perror("Failed to open file ");
+        perror("** Failed to open file ");
         return;
     }
     fwrite(board, sizeof(int), HEIGHT*WIDTH, file);
