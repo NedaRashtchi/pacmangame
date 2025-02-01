@@ -16,6 +16,9 @@
 #define BONUS '$'
 #define ENEMY 'E'
 
+typedef struct{
+	char type;
+}cel;
 
 // Global Variables are 
 // Declared here 
@@ -23,53 +26,11 @@ int res = 0;
 int score = 0; 
 int pacman_x, pacman_y; 
 int enemy_x, enemy_y;
-char board[HEIGHT][WIDTH]; 
+cel board[HEIGHT][WIDTH]; 
 int food = 0;
 int bonus = 0; 
 int curr = 0; 
 int powermove = 0;
-
-void savegame(const char *filename) {
-    FILE *file = fopen(filename, "wb");
-    if (file == NULL){
-        perror("** Failed to open file ");
-        return;
-    }
-    fwrite(board, sizeof(int), HEIGHT*WIDTH, file);
-    fwrite(&score , sizeof(int), 1, file);
-    fwrite(&pacman_x , sizeof(int), 1, file);
-    fwrite(&pacman_y , sizeof(int), 1, file);
-    fwrite(&enemy_x , sizeof(int), 1, file);
-    fwrite(&enemy_y , sizeof(int), 1, file);
-    fwrite(&score , sizeof(int), 1, file);
-    fwrite(&food , sizeof(int), 1, file);
-    fwrite(&bonus , sizeof(int), 1, file);
-    fwrite(&curr , sizeof(int), 1, file);
-    fwrite(&powermove , sizeof(int), 1, file);
-    fclose(file);
-    printf("\nData saved successfully.\n");
-}
-
-void loadgame(const char *filename) {
-    FILE *file = fopen(filename, "rb");
-    if (file == NULL) {
-        perror("Failed to open file ");
-        return;
-    }
-    fread(board, sizeof(int),HEIGHT*WIDTH, file);
-    fread(&score , sizeof(int), 1, file);
-    fread(&pacman_x , sizeof(int), 1, file);
-    fread(&pacman_y , sizeof(int), 1, file);
-    fread(&enemy_x , sizeof(int), 1, file);
-    fread(&enemy_y , sizeof(int), 1, file);
-    fread(&score , sizeof(int), 1, file);
-    fread(&food , sizeof(int), 1, file);
-    fread(&bonus , sizeof(int), 1, file);
-    fread(&curr , sizeof(int), 1, file);
-    fread(&powermove , sizeof(int), 1, file);
-    fclose(file);
-    printf("\nData loaded successfully.\n");
-}
 
 void initialize() 
 { 
@@ -78,10 +39,10 @@ void initialize()
 		for (int j = 0; j < WIDTH; j++) { 
 			if (i == 0 || j == WIDTH - 1 || j == 0 
 				|| i == HEIGHT - 1) { 
-				board[i][j] = WALL; 
+				board[i][j].type = WALL; 
 			} 
 			else
-				board[i][j] = EMPTY; 
+				board[i][j].type = EMPTY; 
 		} 
 	} 
 
@@ -91,8 +52,8 @@ void initialize()
 		int i = (rand() % (HEIGHT + 1)); 
 		int j = (rand() % (WIDTH + 1)); 
 
-		if (board[i][j] != WALL && board[i][j] != PACMAN) { 
-			board[i][j] = WALL; 
+		if (board[i][j].type != WALL && board[i][j].type != PACMAN) { 
+			board[i][j].type = WALL; 
 			count--; 
 		} 
 	} 
@@ -101,9 +62,9 @@ void initialize()
 	while (val--) { 
 		int row = (rand() % (HEIGHT + 1)); 
 		for (int j = 3; j < WIDTH - 3; j++) { 
-			if (board[row][j] != WALL 
-				&& board[row][j] != PACMAN) { 
-				board[row][j] = WALL; 
+			if (board[row][j].type != WALL 
+				&& board[row][j].type != PACMAN) { 
+				board[row][j].type = WALL; 
 			} 
 		} 
 	} 
@@ -114,8 +75,8 @@ void initialize()
 		int i = (rand() % (HEIGHT + 1)); 
 		int j = (rand() % (WIDTH + 1)); 
 
-		if (board[i][j] != WALL && board[i][j] != PACMAN) { 
-			board[i][j] = DEMON; 
+		if (board[i][j].type != WALL && board[i][j].type != PACMAN) { 
+			board[i][j].type = DEMON; 
 			count--; 
 		} 
 	} 
@@ -123,7 +84,7 @@ void initialize()
 	// Cursor at Center 
 	pacman_x = WIDTH / 2; 
 	pacman_y = HEIGHT / 2; 
-	board[pacman_y][pacman_x] = PACMAN; 
+	board[pacman_y][pacman_x].type = PACMAN; 
 
     //placing the enemy
    
@@ -131,8 +92,8 @@ void initialize()
 		int i = (rand() % (HEIGHT + 1)); 
 		int j = (rand() % (WIDTH + 1)); 
 
-		if (board[i][j] != WALL && board[i][j] != PACMAN && board[i][j] != DEMON) { 
-			board[i][j] = ENEMY; 
+		if (board[i][j].type != WALL && board[i][j].type != PACMAN && board[i][j].type != DEMON) { 
+			board[i][j].type = ENEMY; 
             enemy_y = i ;
             enemy_x = j ;
 			break; 
@@ -145,8 +106,8 @@ void initialize()
 		int i = (rand() % (HEIGHT + 1)); 
 		int j = (rand() % (WIDTH + 1)); 
 
-		if (board[i][j] != WALL && board[i][j] != PACMAN && board[i][j] != DEMON && board[i][j] != ENEMY) { 
-			board[i][j] = BONUS; 
+		if (board[i][j].type != WALL && board[i][j].type != PACMAN && board[i][j].type != DEMON && board[i][j].type != ENEMY) { 
+			board[i][j].type = BONUS; 
 			count--; 
             bonus++;
 		} 
@@ -156,17 +117,17 @@ void initialize()
 	for (int i = 0; i < HEIGHT; i++) { 
 		for (int j = 0; j < WIDTH; j++) { 
 			if (i % 2 == 0 && j % 2 == 0 
-				&& board[i][j] != WALL 
-				&& board[i][j] != DEMON 
-				&& board[i][j] != PACMAN
-                && board[i][j] != BONUS
-                && board[i][j] != ENEMY) { 
+				&& board[i][j].type != WALL 
+				&& board[i][j].type != DEMON 
+				&& board[i][j].type != PACMAN
+                && board[i][j].type != BONUS
+                && board[i][j].type != ENEMY) { 
 
-				board[i][j] = FOOD; 
+				board[i][j].type = FOOD; 
 				food++; 
 			} 
 		} 
-	} food-=35;
+	} 
 } 
 
 void draw() 
@@ -177,7 +138,7 @@ void draw()
 	// Drawing All the elements in the screen 
 	for (int i = 0; i < HEIGHT; i++) { 
 		for (int j = 0; j < WIDTH; j++) { 
-			printf("%c", board[i][j]); 
+			printf("%c", board[i][j].type); 
 		} 
 		printf("\n"); 
 	} 
@@ -190,8 +151,8 @@ void move(int move_x, int move_y)
 	int x = pacman_x + move_x; 
 	int y = pacman_y + move_y; 
 
-	if (board[y][x] != WALL) { 
-		if (board[y][x] == FOOD) { 
+	if (board[y][x].type != WALL) { 
+		if (board[y][x].type == FOOD) { 
 			score++; 
 			food--; 
 			curr++; 
@@ -200,17 +161,17 @@ void move(int move_x, int move_y)
 				return; 
 			} 
 		} 
-		else if (board[y][x] == DEMON || board[y][x] == ENEMY) { 
+		else if (board[y][x].type == DEMON || board[y][x].type == ENEMY) { 
 			res = 1; 
 		}
-        else if(board[y][x] == BONUS){
+        else if(board[y][x].type == BONUS){
             powermove += 10;
         } 
 
-		board[pacman_y][pacman_x] = EMPTY; 
+		board[pacman_y][pacman_x].type = EMPTY; 
 		pacman_x = x; 
 		pacman_y = y; 
-		board[pacman_y][pacman_x] = PACMAN; 
+		board[pacman_y][pacman_x].type = PACMAN; 
 	} 
 } 
 void enemymove(){
@@ -219,38 +180,38 @@ void enemymove(){
         //srand(time(NULL));
 		int move = rand() % 4 + 1 ;
 		if(move == 1){
-			if(board[enemy_y + 1][enemy_x] != WALL && board[enemy_y + 1][enemy_x] != FOOD
-			&& board[enemy_y + 1][enemy_x] != DEMON && board[enemy_y + 1][enemy_x] != BONUS)
-			{ board[enemy_y][enemy_x] = EMPTY ;
+			if(board[enemy_y + 1][enemy_x].type != WALL && board[enemy_y + 1][enemy_x].type != FOOD
+			&& board[enemy_y + 1][enemy_x].type != DEMON && board[enemy_y + 1][enemy_x].type != BONUS)
+			{ board[enemy_y][enemy_x].type = EMPTY ;
 			  enemy_y++;
-			  board[enemy_y][enemy_x] = ENEMY ;
+			  board[enemy_y][enemy_x].type = ENEMY ;
 			  break;
 			}
 		}
 		else if(move == 2){
-			if(board[enemy_y][enemy_x - 1] != WALL && board[enemy_y][enemy_x - 1] != FOOD
-			&& board[enemy_y][enemy_x - 1] != DEMON && board[enemy_y][enemy_x - 1] != BONUS)
-			{ board[enemy_y][enemy_x] = EMPTY ;
+			if(board[enemy_y][enemy_x - 1].type != WALL && board[enemy_y][enemy_x - 1].type != FOOD
+			&& board[enemy_y][enemy_x - 1].type != DEMON && board[enemy_y][enemy_x - 1].type != BONUS)
+			{ board[enemy_y][enemy_x].type = EMPTY ;
 			  enemy_x--;
-			  board[enemy_y][enemy_x] = ENEMY ;
+			  board[enemy_y][enemy_x].type = ENEMY ;
 			  break;
 			}
 		}
 		else if(move == 3){
-			if(board[enemy_y - 1][enemy_x] != WALL && board[enemy_y - 1][enemy_x] != FOOD
-			&& board[enemy_y - 1][enemy_x] != DEMON && board[enemy_y - 1][enemy_x] != BONUS)
-			{ board[enemy_y][enemy_x] = EMPTY ;
+			if(board[enemy_y - 1][enemy_x].type != WALL && board[enemy_y - 1][enemy_x].type != FOOD
+			&& board[enemy_y - 1][enemy_x].type != DEMON && board[enemy_y - 1][enemy_x].type != BONUS)
+			{ board[enemy_y][enemy_x].type = EMPTY ;
 			  enemy_y--;
-			  board[enemy_y][enemy_x] = ENEMY ;
+			  board[enemy_y][enemy_x].type = ENEMY ;
 			  break;
 			}
 		}
 		else if(move == 4){
-			if(board[enemy_y][enemy_x + 1] != WALL && board[enemy_y][enemy_x + 1] != FOOD
-			&& board[enemy_y][enemy_x + 1] != DEMON && board[enemy_y][enemy_x + 1] != BONUS)
-			{ board[enemy_y][enemy_x] = EMPTY ;
+			if(board[enemy_y][enemy_x + 1].type != WALL && board[enemy_y][enemy_x + 1].type != FOOD
+			&& board[enemy_y][enemy_x + 1].type != DEMON && board[enemy_y][enemy_x + 1].type != BONUS)
+			{ board[enemy_y][enemy_x].type = EMPTY ;
 			  enemy_x++;
-			  board[enemy_y][enemy_x] = ENEMY ;
+			  board[enemy_y][enemy_x].type = ENEMY ;
 			  break;
 			}
 		}
@@ -264,8 +225,8 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 		int move = rand() % 4 + 1 ;
 
 		if(move==1){
-			if(board[pacman_y+1][pacman_x] == FOOD || board[pacman_y+1][pacman_x] == EMPTY ){
-				if(board[pacman_y+1][pacman_x] == FOOD){
+			if(board[pacman_y+1][pacman_x].type == FOOD || board[pacman_y+1][pacman_x].type == EMPTY ){
+				if(board[pacman_y+1][pacman_x].type == FOOD){
 					score++; 
 					food--; 
 					curr++; 
@@ -273,14 +234,14 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 					res = 2;  
 					}
 				}
-				board[pacman_y][pacman_x] == EMPTY;
+				board[pacman_y][pacman_x].type = EMPTY;
 				pacman_y++;
-				board[pacman_y][pacman_x] == PACMAN;
+				board[pacman_y][pacman_x].type = PACMAN;
 			}
 		}
 		else if(move==2){
-			if(board[pacman_y][pacman_x-1] == FOOD || board[pacman_y][pacman_x-1] == EMPTY ){
-				if(board[pacman_y][pacman_x-1] == FOOD){
+			if(board[pacman_y][pacman_x-1].type == FOOD || board[pacman_y][pacman_x-1].type == EMPTY ){
+				if(board[pacman_y][pacman_x-1].type == FOOD){
 					score++; 
 					food--; 
 					curr++; 
@@ -288,14 +249,14 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 					res = 2;  
 					}
 				}
-				board[pacman_y][pacman_x] == EMPTY;
+				board[pacman_y][pacman_x].type = EMPTY;
 				pacman_x--;
-				board[pacman_y][pacman_x] == PACMAN;
+				board[pacman_y][pacman_x].type = PACMAN;
 			}
 		}
 		else if(move==3){
-			if(board[pacman_y-1][pacman_x] == FOOD || board[pacman_y-1][pacman_x] == EMPTY ){
-				if(board[pacman_y-1][pacman_x] == FOOD){
+			if(board[pacman_y-1][pacman_x].type == FOOD || board[pacman_y-1][pacman_x].type == EMPTY ){
+				if(board[pacman_y-1][pacman_x].type == FOOD){
 					score++; 
 					food--; 
 					curr++; 
@@ -304,14 +265,14 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 					//return; 
 					}
 				}
-				board[pacman_y][pacman_x] == EMPTY;
+				board[pacman_y][pacman_x].type = EMPTY;
 				pacman_y--;
-				board[pacman_y][pacman_x] == PACMAN;
+				board[pacman_y][pacman_x].type = PACMAN;
 			}
 		}
 		else if(move==4){
-			if(board[pacman_y][pacman_x+1] == FOOD || board[pacman_y][pacman_x+1] == EMPTY ){
-				if(board[pacman_y][pacman_x+1] == FOOD){
+			if(board[pacman_y][pacman_x+1].type == FOOD || board[pacman_y][pacman_x+1].type == EMPTY ){
+				if(board[pacman_y][pacman_x+1].type == FOOD){
 					score++; 
 					food--; 
 					curr++; 
@@ -320,9 +281,9 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 					//return; 
 					}
 				}
-				board[pacman_y][pacman_x] == EMPTY;
+				board[pacman_y][pacman_x].type = EMPTY;
 				pacman_x++;
-				board[pacman_y][pacman_x] == PACMAN;
+				board[pacman_y][pacman_x].type = PACMAN;
 			}
 		}
 
@@ -333,20 +294,9 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 // Main Function 
 int main() 
 { 
-    printf("DO you want to ?\n1.start a new game.\n2.Continue the last game.\n ");
-    int choice;
-    scanf("%d" , &choice);
-    if(choice != 1 && choice != 2){
-        printf("Invalid selection.");
-        return 1;
-    }else if(choice == 1){
-        initialize(); 
-    }else if(choice == 2){
-        loadgame("testing.bin");
-    }
-	
+	initialize(); 
 	char ch; 
-	//food -= 35; 
+	food -= 35; 
 	int totalFood = food; 
     int totalbonus = bonus;
     curr = 0 ;
@@ -378,6 +328,7 @@ int main()
 				score); 
 			return 1; 
 		} 
+
 		if (res == 2) { 
 			// Clear screen 
 			system("cls"); 
@@ -409,18 +360,14 @@ int main()
             powermove--; 
 			break; 
 		case 'q': 
-            printf("\nDo you want to save the game? (y / n)\n");
-            if(getch() == 'y'){
-                savegame("testing.bin");
-                return 0;
-            }else{
-			    printf("Game Over! Your Score: %d\n", score); 
-			    return 0; }
+			printf("Game Over! Your Score: %d\n", score); 
+			return 0;
 		case 'p':
 			play();
 			break;	 
 		} 
 	    } 
+
         else if(powermove <= 0){ 
 		switch (ch) { 
 		case 'w': 
@@ -436,18 +383,16 @@ int main()
 			move(1, 0); 
 			break; 
 		case 'q': 
-			printf("\nDo you want to save the game? (y / n)\n");
-            if(getch() == 'y'){
-                savegame("testing.bin");
-                return 0;
-            }else{
-			    printf("Game Over! Your Score: %d\n", score); 
-			    return 0; }
+			printf("Game Over! Your Score: %d\n", score); 
+			return 0;
 		case 'p':
 			play();
 			break;	
 		} 
 	    } 
+        
+	    
     }
+
 	return 0; 
 }
