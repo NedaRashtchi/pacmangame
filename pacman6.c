@@ -2,7 +2,9 @@
 #include <conio.h> 
 #include <stdio.h> 
 #include <stdlib.h>
-//#include <time.h>
+//#include <unistd.h>
+#include <time.h>
+//#include <windows.h>
 
 // All the elements to be used 
 // Declared here 
@@ -279,10 +281,11 @@ void enemymove(){
 
 void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 	while(res != 2){
-		//srand(time(NULL));
+		srand(time(NULL));
 		int move = rand() % 4 + 1 ;
-
+		
 		if(move==1 && pacman_y + 1 < HEIGHT ){
+			//usleep(500);
 			if(board[pacman_y+1][pacman_x].type == FOOD || board[pacman_y+1][pacman_x].type == EMPTY ){
 				if(board[pacman_y+1][pacman_x].type == FOOD){
 					score++; 
@@ -291,13 +294,16 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 					if(food == 0) { 
 					res = 2;  
 					}
+					//usleep(50);
 				}
 				board[pacman_y][pacman_x].type = EMPTY;
 				pacman_y++;
 				board[pacman_y][pacman_x].type = PACMAN;
+				draw();
 			}
 		}
 		else if(move==2 && (pacman_x-1) >= 0){
+			//usleep(500);
 			if(board[pacman_y][pacman_x-1].type == FOOD || board[pacman_y][pacman_x-1].type == EMPTY ){
 				if(board[pacman_y][pacman_x-1].type == FOOD){
 					score++; 
@@ -306,13 +312,16 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 					if(food == 0) { 
 					res = 2;  
 					}
+					//usleep(50);
 				}
 				board[pacman_y][pacman_x].type = EMPTY;
 				pacman_x--;
 				board[pacman_y][pacman_x].type = PACMAN;
+				draw();
 			}
 		}
-		else if(move==3 && (pacman_y-1) >= 0){
+		else if(move==3 && (pacman_y-1) >= 0 ){
+			//usleep(500);
 			if(board[pacman_y-1][pacman_x].type == FOOD || board[pacman_y-1][pacman_x].type == EMPTY ){
 				if(board[pacman_y-1][pacman_x].type == FOOD){
 					score++; 
@@ -322,13 +331,16 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 					res = 2; 
 					//return; 
 					}
+					//usleep(50);
 				}
 				board[pacman_y][pacman_x].type = EMPTY;
 				pacman_y--;
 				board[pacman_y][pacman_x].type = PACMAN;
+				draw();
 			}
 		}
-		else if(move==4 && (pacman_x+1) < WIDTH){
+		else if(move==4 && (pacman_x+1) < WIDTH ){
+			//usleep(500);
 			if(board[pacman_y][pacman_x+1].type == FOOD || board[pacman_y][pacman_x+1].type == EMPTY ){
 				if(board[pacman_y][pacman_x+1].type == FOOD){
 					score++; 
@@ -338,13 +350,15 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 					res = 2; 
 					//return; 
 					}
+					//usleep(50);
 				}
 				board[pacman_y][pacman_x].type = EMPTY;
 				pacman_x++;
 				board[pacman_y][pacman_x].type = PACMAN;
+				draw();
 			}
 		}
-
+		
 	}
 }
 
