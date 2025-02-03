@@ -1,14 +1,8 @@
-// Pacman Game in C language 
 #include <conio.h> 
 #include <stdio.h> 
 #include <stdlib.h>
 #include <unistd.h>
-#include <stdbool.h>
-//#include <time.h>
-//#include <windows.h>
 
-// All the elements to be used 
-// Declared here 
 #define WIDTH 40 
 #define HEIGHT 20 
 #define PACMAN 'C' 
@@ -19,14 +13,13 @@
 #define BONUS '$'
 #define ENEMY 'E'
 #define TRAP 'o'
+#define WIN_SCORE 50
 
 typedef struct{
 	char type;
     int value;
 }cel;
 
-// Global Variables are 
-// Declared here 
 cel board[HEIGHT][WIDTH];
 int res = 0; 
 int score = 0; 
@@ -36,8 +29,6 @@ int food = 0;
 int bonus = 0; 
 int curr = 0; 
 int powermove = 0;
-
-
 
 void savegame() {
     FILE *file = fopen("myfile.bin", "wb");
@@ -60,7 +51,6 @@ void savegame() {
     fclose(file);
     printf("\nData saved successfully.\n");
 }
-
 void loadgame() {
     FILE *file = fopen("myfile.bin", "rb");
     if (file == NULL) {
@@ -103,12 +93,10 @@ void initialize()
 	while (count != 0) { 
 		int i = (rand() % (HEIGHT + 1)); 
 		int j = (rand() % (WIDTH + 1)); 
-		//int i = rand() % HEIGHT ; 
-		//int j = rand() % WIDTH ; 
-
+	
 		if (board[i][j].type != WALL && board[i][j].type != PACMAN) { 
-			board[i][j].type = WALL;
-            //board[i][j].value = 0; 
+			
+            board[i][j].type = WALL;
 			count--; 
 		} 
 	} 
@@ -116,11 +104,10 @@ void initialize()
 	int val = 5; 
 	while (val--) { 
 		int row = (rand() % (HEIGHT + 1)); 
-		//int row = rand() % HEIGHT;
+	
 		for (int j = 3; j < WIDTH - 3; j++) { 
 			if (board[row][j].type != WALL && board[row][j].type != PACMAN) { 
 				board[row][j].type = WALL; 
-               // board[row][j].value = 0;
 			} 
 		} 
 	} 
@@ -130,13 +117,10 @@ void initialize()
 	while (count != 0) { 
 		int i = (rand() % (HEIGHT + 1)); 
 		int j = (rand() % (WIDTH + 1));
-		//int i = rand() % HEIGHT;
-        //int j = rand() % WIDTH;
- 
-
+	
 		if (board[i][j].type != WALL && board[i][j].type != PACMAN) { 
-			board[i][j].type = DEMON; 
-            //board[i][j].value = 0;
+			
+            board[i][j].type = DEMON; 
 			count--; 
 		} 
 	} 
@@ -146,14 +130,10 @@ void initialize()
 	while (count != 0) { 
 		int i = (rand() % (HEIGHT + 1)); 
 		int j = (rand() % (WIDTH + 1));
-		//int i = rand() % HEIGHT;
-        //int j = rand() % WIDTH;
- 
 
 		if (board[i][j].type != WALL && board[i][j].type != PACMAN && board[i][j].type != DEMON) { 
-			board[i][j].type = TRAP; 
-            //board[i][j].isTrap = true ;
-           // board[i][j].value = -2;
+			
+            board[i][j].type = TRAP; 
 			count--; 
 		} 
 	} 
@@ -166,8 +146,7 @@ void initialize()
     //placing the enemy
    
 	while (1) { 
-		//int i = (rand() % (HEIGHT + 1)); 
-		//int j = (rand() % (WIDTH + 1)); 
+	
 		int i = rand() % HEIGHT;
         int j = rand() % WIDTH;
 
@@ -183,15 +162,14 @@ void initialize()
 	// Putting bonus 
 	count = 10; 
 	while (count != 0) { 
-		//int i = (rand() % (HEIGHT + 1)); 
-		//int j = (rand() % (WIDTH + 1));
+		
 		int i = rand() % HEIGHT;
         int j = rand() % WIDTH; 
 
 		if (board[i][j].type != WALL && board[i][j].type != PACMAN && board[i][j].type != DEMON 
 		   && board[i][j].type != ENEMY && board[i][j].type != TRAP) { 
-			board[i][j].type = BONUS;
-           // board[i][j].value = 2; 
+			
+            board[i][j].type = BONUS;
 			count--; 
             bonus++;
 		} 
@@ -210,20 +188,17 @@ void initialize()
 				&& board[i][j].type != TRAP) { 
 
 				board[i][j].type = FOOD; 
-                //board[i][j].value = 1 ;
 				food++; 
 			} 
 		} 
-	} food -= 85;
+	} food -= 80;
 	
 } 
 
 void draw() 
-{ 
-	// Clear screen 
+{  
 	system("cls"); 
-
-	// Drawing All the elements in the screen 
+	 
 	for (int i = 0; i < HEIGHT; i++) { 
 		for (int j = 0; j < WIDTH; j++) { 
 			printf("%c", board[i][j].type); 
@@ -245,7 +220,7 @@ void move(int move_x, int move_y)
             score += board[y][x].value;
 			food--; 
 			curr++; 
-			if (/*food == 0*/ score >= 50 ) { 
+			if (/*food == 0*/ score >= WIN_SCORE ) { 
 				res = 2; 
 				return; 
 			} 
@@ -259,15 +234,14 @@ void move(int move_x, int move_y)
         } 
         else if(board[y][x].type == TRAP){
             score += board[y][x].value ;
-            //food+=2;
+          
         }
 
 		board[pacman_y][pacman_x].type = EMPTY;
-       // board[pacman_y][pacman_x].value = 0 ; 
 		pacman_x = x; 
 		pacman_y = y; 
 		board[pacman_y][pacman_x].type = PACMAN; 
-      //  board[pacman_y][pacman_x].value = 0;
+     
 	} 
 } 
 void enemymove(){
@@ -276,9 +250,7 @@ void enemymove(){
         //srand(time(NULL));
 		int move = rand() % 4 + 1 ;
 		if(move == 1 && (enemy_y+1) < HEIGHT){ // shart kharej nashodan az divar
-			if(board[enemy_y + 1][enemy_x].type != WALL && board[enemy_y + 1][enemy_x].type != FOOD
-			&& board[enemy_y + 1][enemy_x].type != DEMON && board[enemy_y + 1][enemy_x].type != BONUS
-            && board[enemy_y + 1][enemy_x].type != TRAP)
+			if(board[enemy_y + 1][enemy_x].type ==EMPTY || board[enemy_y + 1][enemy_x].type == PACMAN)
 			{   if(board[enemy_y + 1][enemy_x].type == PACMAN){
                 res = 1;
                 }
@@ -289,9 +261,7 @@ void enemymove(){
 			}
 		}
 		else if(move == 2 && (enemy_x-1) >= 0){
-			if(board[enemy_y][enemy_x - 1].type != WALL && board[enemy_y][enemy_x - 1].type != FOOD
-			&& board[enemy_y][enemy_x - 1].type != DEMON && board[enemy_y][enemy_x - 1].type != BONUS
-            && board[enemy_y][enemy_x - 1].type != TRAP)
+			if(board[enemy_y][enemy_x - 1].type ==EMPTY || board[enemy_y][enemy_x - 1].type == PACMAN)
 			{   if(board[enemy_y][enemy_x - 1].type == PACMAN){
                 res = 1;
                 }
@@ -302,9 +272,7 @@ void enemymove(){
 			}
 		}
 		else if(move == 3 && (enemy_y-1) >= 0){
-			if(board[enemy_y - 1][enemy_x].type != WALL && board[enemy_y - 1][enemy_x].type != FOOD
-			&& board[enemy_y - 1][enemy_x].type != DEMON && board[enemy_y - 1][enemy_x].type != BONUS
-            && board[enemy_y - 1][enemy_x].type != TRAP)
+			if(board[enemy_y - 1][enemy_x].type == EMPTY || board[enemy_y - 1][enemy_x].type == PACMAN)
 			{   if(board[enemy_y - 1][enemy_x].type == PACMAN){
                 res = 1;
                 }
@@ -315,9 +283,7 @@ void enemymove(){
 			}
 		}
 		else if(move == 4 && (enemy_x+1) < WIDTH){
-			if(board[enemy_y][enemy_x + 1].type != WALL && board[enemy_y][enemy_x + 1].type != FOOD
-			&& board[enemy_y][enemy_x + 1].type != DEMON && board[enemy_y][enemy_x + 1].type != BONUS
-            && board[enemy_y][enemy_x + 1].type != TRAP)
+			if(board[enemy_y][enemy_x + 1].type == EMPTY || board[enemy_y][enemy_x + 1].type == PACMAN)
 			{   if(board[enemy_y][enemy_x + 1].type == PACMAN){
                 res = 1;
                 }
@@ -338,14 +304,14 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 		int move = rand() % 4 + 1 ;
 		
 		if(move==1 && pacman_y + 1 < HEIGHT ){
-			//usleep(500);
+			
 			if(board[pacman_y+1][pacman_x].type == FOOD || board[pacman_y+1][pacman_x].type == EMPTY 
                || board[pacman_y+1][pacman_x].type == BONUS){
 				if(board[pacman_y+1][pacman_x].type == FOOD){
 					score += board[pacman_y+1][pacman_x].value ; 
 					food--; 
 					curr++; 
-					if(score >= 50) { 
+					if(score >= WIN_SCORE) { 
 					res = 2;  
 					}
 					usleep(100);
@@ -357,14 +323,14 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 			}
 		}
 		else if(move==2 && (pacman_x-1) >= 0){
-			//usleep(500);
+			
 			if(board[pacman_y][pacman_x-1].type == FOOD || board[pacman_y][pacman_x-1].type == EMPTY 
                || board[pacman_y][pacman_x-1].type == BONUS){
 				if(board[pacman_y][pacman_x-1].type == FOOD){
 					score += board[pacman_y][pacman_x-1].value ; 
 					food--; 
 					curr++; 
-					if(score >= 50) { 
+					if(score >= WIN_SCORE) { 
 					res = 2;  
 					}
 					usleep(100);
@@ -376,14 +342,14 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 			}
 		}
 		else if(move==3 && (pacman_y-1) >= 0 ){
-			//usleep(500);
+			
 			if(board[pacman_y-1][pacman_x].type == FOOD || board[pacman_y-1][pacman_x].type == EMPTY 
               || board[pacman_y-1][pacman_x].type == BONUS){
 				if(board[pacman_y-1][pacman_x].type == FOOD){
 					score += board[pacman_y-1][pacman_x].value ; 
 					food--; 
 					curr++; 
-					if(food >= 50) { 
+					if(score >= WIN_SCORE) { 
 					res = 2; 
 					//return; 
 					}
@@ -396,14 +362,14 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 			}
 		}
 		else if(move==4 && (pacman_x+1) < WIDTH ){
-			//usleep(500);
+			
 			if(board[pacman_y][pacman_x+1].type == FOOD || board[pacman_y][pacman_x+1].type == EMPTY 
             || board[pacman_y][pacman_x+1].type == BONUS){
 				if(board[pacman_y][pacman_x+1].type == FOOD){
 					score += board[pacman_y][pacman_x+1].value ; 
 					food--; 
 					curr++; 
-					if(food >= 50) { 
+					if(score >= WIN_SCORE) { 
 					res = 2; 
 					//return; 
 					}
@@ -560,10 +526,7 @@ int main()
 			play();
 			break;	
 		} 
-	    } 
-        
-	    
+	    }    
     }
-
 	return 0; 
 }
