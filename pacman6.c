@@ -2,8 +2,8 @@
 #include <conio.h> 
 #include <stdio.h> 
 #include <stdlib.h>
-//#include <unistd.h>
-#include <time.h>
+#include <unistd.h>
+//#include <time.h>
 //#include <windows.h>
 
 // All the elements to be used 
@@ -186,7 +186,7 @@ void initialize()
 				food++; 
 			} 
 		} 
-	} food -= 60;
+	} food -= 85;
 	
 } 
 
@@ -281,7 +281,8 @@ void enemymove(){
 
 void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 	while(res != 2){
-		srand(time(NULL));
+		//srand(time(NULL));
+		enemymove();
 		int move = rand() % 4 + 1 ;
 		
 		if(move==1 && pacman_y + 1 < HEIGHT ){
@@ -294,7 +295,7 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 					if(food == 0) { 
 					res = 2;  
 					}
-					//usleep(50);
+					usleep(100);
 				}
 				board[pacman_y][pacman_x].type = EMPTY;
 				pacman_y++;
@@ -312,7 +313,7 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 					if(food == 0) { 
 					res = 2;  
 					}
-					//usleep(50);
+					usleep(100);
 				}
 				board[pacman_y][pacman_x].type = EMPTY;
 				pacman_x--;
@@ -331,7 +332,7 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 					res = 2; 
 					//return; 
 					}
-					//usleep(50);
+					usleep(100);
 				}
 				board[pacman_y][pacman_x].type = EMPTY;
 				pacman_y--;
@@ -350,7 +351,7 @@ void play(){ // 1 for up , 2 for left, 3 for down , 4 for right
 					res = 2; 
 					//return; 
 					}
-					//usleep(50);
+					usleep(100);
 				}
 				board[pacman_y][pacman_x].type = EMPTY;
 				pacman_x++;
@@ -403,7 +404,7 @@ int main()
 		printf("Total Food count: %d\n", totalFood); 
 		printf("Total Food eaten: %d\n", curr); 
         printf("Total Bonus count: %d\n" , totalbonus);
-        printf("Power moves: %d\n" , powermove);
+        if(powermove > 0) printf("Power moves: %d\n" , powermove);
 		if (res == 1) { 
 			// Clear screen 
 			system("cls"); 
